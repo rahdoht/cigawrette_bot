@@ -1,0 +1,13 @@
+{
+  "name": "cigawettes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "canvas": "^2.10.1",
+    "dotenv": "^16.0.3",
+    "twit": "^2.2.11",
+    "twitter-v2": "^1.1.0"
+  }
+}
