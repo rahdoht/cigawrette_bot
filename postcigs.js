@@ -14,7 +14,7 @@ readline.createInterface({
 // export CONSUMER_KEY='YOUR-KEY'
 // export CONSUMER_SECRET='YOUR-SECRET'
 const consumer_key = process.env.API_KEY;
-const consumer_secret = process.env.API_KEY_SECRET;
+const consumer_secret = process.env.API_SECRET;
 
 
 // Be sure to add replace the text of the with the text you wish to Tweet.

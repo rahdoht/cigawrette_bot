@@ -1,19 +1,36 @@
 {
   "name": "cigawettes",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "index.js",
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.10.1",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "got": "^12.5.2",
-    "needle": "^3.1.0",
+    "needle": "^3.2.0",
     "node-fetch": "^3.2.10",
     "oauth-1.0a": "^2.2.6",
     "querystring": "^0.2.1",
     "twit": "^2.2.11",
+    "twitter-api-sdk": "^1.2.1",
     "twitter-v2": "^1.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yintii/cigawette_bot.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/Yintii/cigawette_bot/issues"
+  },
+  "homepage": "https://github.com/Yintii/cigawette_bot#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^18.11.18"
   }
 }
