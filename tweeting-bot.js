@@ -98,8 +98,7 @@ async function accessToken({
 async function getRequest({
   oauth_token,
   oauth_token_secret,
-  data
-}) {
+}, data) {
 
   const token = {
     key: oauth_token,
@@ -190,7 +189,7 @@ async function getRequest({
         let renderTxt = tweet.data.text.slice(21);
         
         data = {
-          "text": renderTxt
+          "text": `${renderTxt}`
         }
 
         console.log("text to render: ", renderTxt);
@@ -203,7 +202,7 @@ async function getRequest({
       //write buffer to image file
       fs.writeFileSync('./newImages/uwu1.jpg', IMG_BUFFER)
       // Make the request
-      const response = await getRequest(oAuthAccessToken, null, data);
+      const response = await getRequest(oAuthAccessToken, data);
       console.dir(response, {
         depth: null
       });
