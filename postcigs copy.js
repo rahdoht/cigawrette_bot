@@ -3,11 +3,6 @@ import crypto from 'crypto'
 import OAuth from 'oauth-1.0a';
 import qs from 'querystring';
 import readline from 'readline';
-import { createCanvas, loadImage } from 'canvas'
-import fs from 'fs'
-import { Client } from "twitter-api-sdk";
-import dotenv from "dotenv";
-dotenv.config()
 
 readline.createInterface({
     input: process.stdin,
