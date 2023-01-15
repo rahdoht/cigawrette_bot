@@ -8,8 +8,19 @@ import { createCanvas, loadImage } from 'canvas'
 import fs from 'fs'
 import { Client } from "twitter-api-sdk";
 
+import Twit from 'twit'
+
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 dotenv.config()
+
+const oldClient = new Twit({
+	consumer_key:         process.env.CIG_KEY,
+  consumer_secret:      process.env.CIG_SECRET,
+  access_token:         process.env.CIG_ACCESS,
+  access_token_secret:  process.env.CIG_ACCESS_SECRET,
+  timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
+  strictSSL:            true,  
+})
 
 const rd = readline.createInterface({
   input: process.stdin,
@@ -153,7 +164,7 @@ async function getRequest({
     let images = fs.readdirSync('./images');
     let randomCigawette = Math.floor(Math.random() * images.length);
     let chosenCig = images[randomCigawette];
-    loadImage(`images/${chosenCig}`).then(async (image) => {
+    loadImage(`images/${chosenCig}`).then((image) => {
   
       const CANVAS = createCanvas(1639, 2048)
       const CTX = CANVAS.getContext('2d')
@@ -188,10 +199,6 @@ async function getRequest({
   
         let renderTxt = tweet.data.text.slice(21);
         
-        data = {
-          "text": `${renderTxt}`
-        }
-
         console.log("text to render: ", renderTxt);
         CTX.fillText(
           renderTxt, //user input
@@ -201,18 +208,35 @@ async function getRequest({
       const IMG_BUFFER = CANVAS.toBuffer('image/jpeg')
       //write buffer to image file
       fs.writeFileSync('./newImages/uwu1.jpg', IMG_BUFFER)
-      // Make the request
-      const response = await getRequest(oAuthAccessToken, data);
-      console.dir(response, {
-        depth: null
-      });
-      })
+
+
+			let b64content = fs.readFileSync('./newImages/uwu1.jpg', {encoding: 'base64'})	
+
+			oldClient.post('media/upload', {media_data: b64content}, function(err, data, response){
+        if(err) console.error('error: ', err);
+        let mediaIdStr = data.media_id_string
+				let altText = "A pack of Cigawrettes."
+				let meta_params = {media_id: mediaIdStr, alt_text: {text: altText}}
+
+				oldClient.post('media/metadata/create', meta_params, async function(err, data, response){
+            if(!err){
+              data = {
+                "text": renderTxt,
+                "media":{
+                "media_ids": [mediaIdStr],
+                }
+              } 
+              const response = await getRequest(oAuthAccessToken, data);
+              console.dir(response, {
+                depth: null
+              });
+            }
+          });
+        });	
+      });	
     }
-
-
-  } catch (e) {
-    console.log(e);
-    process.exit(-1);
+  } catch(err){
+    console.error("error: ", err);
+    process.exit(1)
   }
-  process.exit();
 })();
