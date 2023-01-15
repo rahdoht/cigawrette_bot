@@ -13,14 +13,7 @@ import Twit from 'twit'
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 dotenv.config()
 
-const oldClient = new Twit({
-	consumer_key:         process.env.CIG_KEY,
-  consumer_secret:      process.env.CIG_SECRET,
-  access_token:         process.env.CIG_ACCESS,
-  access_token_secret:  process.env.CIG_ACCESS_SECRET,
-  timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
-  strictSSL:            true,  
-})
+
 
 const rd = readline.createInterface({
   input: process.stdin,
@@ -28,18 +21,11 @@ const rd = readline.createInterface({
 });
 
 
-// The code below sets the consumer key and consumer secret from your environment variables
-// To set environment variables on macOS or Linux, run the export commands below from the terminal:
-// export CONSUMER_KEY='YOUR-KEY'
-// export CONSUMER_SECRET='YOUR-SECRET'
-const consumer_key = process.env.CIG_KEY; 
-const consumer_secret = process.env.CIG_SECRET; 
+// const consumer_key = process.env.CIG_KEY; 
+// const consumer_secret = process.env.CIG_SECRET; 
 
-// Be sure to add replace the text of the with the text you wish to Tweet.
-// You can also add parameters to post polls, quote Tweets, Tweet with reply settings, and Tweet to Super Followers in addition to other features.
-let data = {
-  "text": "Hello world!"
-};
+const consumer_key = process.env.PBR_API_KEY; 
+const consumer_secret = process.env.PBR_API_KEY_SECRET; 
 
 const endpointURL = `https://api.twitter.com/2/tweets`;
 
@@ -151,21 +137,49 @@ async function getRequest({
     const oAuthAccessToken = await accessToken(oAuthRequestToken, pin.trim());
 
     //now we have the token to make requests
-    const client = new Client(process.env.CIG_BEARER);
+    // const client = new Client(process.env.CIG_BEARER);
+    const client = new Client(process.env.PBR_BEARER);
 
+    //for adding and deleting rules
+    await client.tweets.addOrDeleteRules(
+      {
+        add: [
+           {'value': "@cigawrettebot render"},
+        ]
+      }
+    );
+
+
+    const oldClient = new Twit({
+      // consumer_key:         process.env.CIG_KEY,
+      // consumer_secret:      process.env.CIG_SECRET,
+      // access_token:         process.env.CIG_ACCESS,
+      // access_token_secret:  process.env.CIG_ACCESS_SECRET,
+      consumer_key:         process.env.PBR_API_KEY,
+      consumer_secret:      process.env.PBR_API_KEY_SECRET,
+      access_token:         process.env.PBR_ACCESS_TOKEN,
+      access_token_secret:  process.env.PBR_ACCESS_TOKEN_SECRET,
+      timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
+      strictSSL:            true,  
+    })
+
+    
     const rules = await client.tweets.getRules();
     console.log(rules);
+    
     const stream = client.tweets.searchStream({
       "tweet.fields": ["author_id", "geo"],
     });
 
     for await (const tweet of stream){
-  
+    
+    //get random image and load it in
     let images = fs.readdirSync('./images');
     let randomCigawette = Math.floor(Math.random() * images.length);
     let chosenCig = images[randomCigawette];
     loadImage(`images/${chosenCig}`).then((image) => {
   
+      //set up a canvas to use the image and place the text on top
       const CANVAS = createCanvas(1639, 2048)
       const CTX = CANVAS.getContext('2d')
     
@@ -209,23 +223,25 @@ async function getRequest({
       //write buffer to image file
       fs.writeFileSync('./newImages/uwu1.jpg', IMG_BUFFER)
 
-
+      //set image to appropriate format for media upload
 			let b64content = fs.readFileSync('./newImages/uwu1.jpg', {encoding: 'base64'})	
 
+      //using Twit now to perform the upload
 			oldClient.post('media/upload', {media_data: b64content}, function(err, data, response){
         if(err) console.error('error: ', err);
         let mediaIdStr = data.media_id_string
 				let altText = "A pack of Cigawrettes."
 				let meta_params = {media_id: mediaIdStr, alt_text: {text: altText}}
-
+        //once we have the mediaId we attach it to the data object
 				oldClient.post('media/metadata/create', meta_params, async function(err, data, response){
             if(!err){
-              data = {
+              let data = {
                 "text": renderTxt,
                 "media":{
                 "media_ids": [mediaIdStr],
                 }
               } 
+              //send the data object in the request
               const response = await getRequest(oAuthAccessToken, data);
               console.dir(response, {
                 depth: null
