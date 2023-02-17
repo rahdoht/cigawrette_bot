@@ -1,4 +1,4 @@
-import { TwitterMediaUploader } from "./mediaUploader.js"
+import { TwitterMediaUploader } from "./mediaUploader.js";
 
 const photos = [
   {
