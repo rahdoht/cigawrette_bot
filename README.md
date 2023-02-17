@@ -24,11 +24,11 @@ node renderImage.js
 To deploy CigawretteBot, you need to fill out the following variables in a .env file:
 
 ```toml
-CONSUMER_KEY=Your Twitter API consumer key
-CONSUMER_SECRET=Your Twitter API consumer secret
-TOKEN=Your Twitter API access token
-TOKEN_SECRET=Your Twitter API access token secret
-BEARER_TOKEN=Your Twitter API bearer token
+CONSUMER_KEY=YourTwitterAPIconsumerkey
+CONSUMER_SECRET=YourTwitterAPIconsumersecret
+TOKEN=YourTwitterAPIaccesstoken
+TOKEN_SECRET=YourTwitterAPIaccesstokensecret
+BEARER_TOKEN=YourTwitterAPIbearertoken
 ```
 
 You can obtain these credentials by creating a Twitter developer account and creating a new app.
