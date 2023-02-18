@@ -2,7 +2,7 @@
   "name": "cigawettes",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "renderBot.js",
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.10.1",
@@ -20,19 +20,11 @@
     "twitter-v2": "^1.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node renderBot.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Yintii/cigawette_bot.git"
-  },
-  "author": "",
-  "bugs": {
-    "url": "https://github.com/Yintii/cigawette_bot/issues"
-  },
-  "homepage": "https://github.com/Yintii/cigawette_bot#readme",
-  "description": "",
-  "devDependencies": {
-    "@types/node": "^18.11.18"
+  "description": "an image of a thing",
+  "engines": {
+    "node": "18.x"
   }
 }
