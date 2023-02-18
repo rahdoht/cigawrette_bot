@@ -40,3 +40,14 @@ node renderBot.js
 ```
 
 This will start the bot, which will listen for incoming tweets and generate and tweet images as specified. You can run this command on a server or a hosting platform such as Heroku to keep the bot running 24/7.
+
+## Heroku CLI
+
+```sh
+heroku login
+heroku create -t cigbot
+heroku local web
+heroku config:set $(cat .env | sed '/^$/d; /#[[:print:]]*$/d')
+git push heroku main
+heroku logs --tail
+```
