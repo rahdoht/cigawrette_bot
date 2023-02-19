@@ -25,7 +25,7 @@ export async function renderBot() {
     // );
 
     const rules = await client.tweets.getRules();
-    console.log(`rules: ${rules}`);
+    console.log(rules);
     const stream = client.tweets.searchStream({
       "tweet.fields": ["author_id", "geo"],
     });
@@ -65,9 +65,3 @@ export async function renderBot() {
     console.error("Error while running the bot: ", error);
   }
 }
-renderBot()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error("Err: ", err);
-    process.exit(1);
-  });
