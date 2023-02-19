@@ -7,7 +7,7 @@ import { TwitterMediaUploader } from "./mediaUploader.js";
 
 dotenv.config({ silent: true });
 
-async function main() {
+export async function renderBot() {
   try {
     const client = new Client(process.env.BEARER_TOKEN);
 
@@ -25,7 +25,7 @@ async function main() {
     // );
 
     const rules = await client.tweets.getRules();
-    console.log(rules);
+    console.log(`rules: ${rules}`);
     const stream = client.tweets.searchStream({
       "tweet.fields": ["author_id", "geo"],
     });
@@ -65,7 +65,7 @@ async function main() {
     console.error("Error while running the bot: ", error);
   }
 }
-main()
+renderBot()
   .then(() => process.exit(0))
   .catch((err) => {
     console.error("Err: ", err);
