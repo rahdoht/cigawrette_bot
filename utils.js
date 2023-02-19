@@ -62,5 +62,5 @@ export const putLabel = (image, label) => {
         //create the image buffer to write to an image file
         const IMG_BUFFER = CANVAS.toBuffer("image/jpeg");
         //write buffer to image file
-        fs.writeFileSync("./newImages/uwu1.jpg", IMG_BUFFER);
+        fs.writeFileSync("./renderedCig.jpg", IMG_BUFFER);
 }

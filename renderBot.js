@@ -48,7 +48,7 @@ export async function renderBot() {
           //do that here:
           const photos = [
             {
-              path: "./newImages/uwu1.jpg",
+              path: "./renderedCig.jpg",
               type: "image/jpg",
             },
           ];

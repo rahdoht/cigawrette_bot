@@ -2,7 +2,7 @@ import { TwitterMediaUploader } from "./mediaUploader.js";
 
 const photos = [
   {
-    path: "./newImages/uwu1.jpg",
+    path: "./renderedCig.jpg",
     type: "image/jpg",
   },
 ];
