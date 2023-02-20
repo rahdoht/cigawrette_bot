@@ -37,9 +37,27 @@ export async function renderBot() {
       let chosenCig = images[randomCigawrette];
       loadImage(`images/${chosenCig}`)
         .then(async (image) => {
-          let renderTxt = tweet.data.text.slice(
-            "@cigawrettebot render ".length
-          );
+          let renderTxt;
+          if (tweet.in_reply_to_status_id_str) {
+            // Retrieve the parent tweet using the API
+            const parentId = tweet.in_reply_to_status_id_str;
+            renderTxt = await new Promise((resolve, reject) => {
+              client.get(
+                "statuses/show",
+                { id: parentId },
+                function (error, parentTweet, response) {
+                  if (error) reject(error);
+                  // Use the text from the parent tweet
+                  console.log("Reply to: " + parentTweet.text);
+                  resolve(parentTweet.data.text);
+                }
+              );
+            });
+          } else {
+            // Use the text from the current tweet
+            console.log("Tweet: " + tweet.text);
+            renderTxt = tweet.data.text.slice("@cigawrettebot render ".length);
+          }
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
         })

@@ -31,13 +31,11 @@ export const putLabel = (image, label) => {
 
   const TEXT_X = 915;
   const TEXT_Y = 1465;
-  // const TEXT_X = 840;
-  // const TEXT_Y = 1540;
   ctx.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  var fontSize = 35;
+  var fontSize = 28;
   ctx.font = `bold ${fontSize}px helvetica`;
 
   // // helper squares

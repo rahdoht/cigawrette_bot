@@ -6,17 +6,36 @@ let images = fs.readdirSync("./images");
 let randomCigawette = Math.floor(Math.random() * images.length);
 let chosenCig = images[randomCigawette];
 
-let givenPhrase1 = `foobar`;
+const tweets = [
+  // Sarcastic tweets
+  "Oh wow, an NFT project based on cigarette packs? Just what the world needs, more glorification of smoking! 🚬👏",
+  "I've always wanted to own a digital representation of a pack of cigarettes... said no one ever. 🤦‍♀️💻📉",
+  "Finally, an NFT project that can really help people: by making them feel nostalgic for the good old days when smoking was cool. 😒💰👎",
+  "Great, now we can collect virtual cigarette packs... because physical packs just aren't wasteful enough. 🤦‍♂️🌍💸",
+  "Because what's the point of spending money on a virtual asset if it doesn't also contribute to lung cancer? 🤔💸🤢",
 
-let givenPhrase2 = `A longer phrase that is about quarter of the provided length that could be taken`;
+  // Ironic tweets
+  "If you're looking for a way to invest your money, might I suggest an NFT project based on something truly valuable and timeless... like cigarette packs. 🤑💸💩",
+  "Finally, an NFT project that embodies the timeless values of society: addiction, disease, and premature death. 😂🤣🚬💀",
+  "I hear the Cigawrette Packs NFT project is going to be worth millions someday... or maybe just a few bucks if you're lucky. 😜💰💸",
+  "You know what they say: smoking kills, but at least your NFT collection will live on forever. 😎🚬💻",
+  "Who needs real art when you can have a digital image of a pack of cigarettes that nobody will ever care about? 🎨💻😂",
 
-let givenPhrase3 = `An even longer phrase that is
-about half of the provided 
-length that could be taken
-wee weoo weoo weo ewoweo 
-leedle leedle leedle leedle
-lee`;
+  // Shorter
+  "Cigawrette Packs - where virtual smoking meets virtual art. 💨🎨",
+  "Who needs a nicotine fix when you can have a Cigawrette Pack? 💻💰",
+  "Just bought my first Cigawrette Pack and my wallet is already feeling lighter. 💸😭",
+  "Cigawrette Packs: because why settle for a boring old stock portfolio? 📈💼",
+  "I never thought I'd be excited about a virtual cigarette pack, but here we are. 🤷‍♀️💻",
+  "Cigawrette Packs: the new status symbol for the virtual world. 💰💻",
+  "I don't smoke in real life, but I'm addicted to collecting Cigawrette Packs. 🤑💻",
+  "Cigawrette Packs: the perfect gift for that friend who has everything. 💁‍♀️💻",
+  "Just when you thought you've seen it all, Cigawrette Packs come along. 🤯💻",
+  "I'm not saying I'm addicted to Cigawrette Packs, but my wallet would beg to differ. 🙈💸",
+];
+
+let randomTweet = tweets[Math.floor(Math.random() * tweets.length)];
 
 loadImage(`images/${chosenCig}`).then((image) => {
-  putLabel(image, givenPhrase2);
+  putLabel(image, randomTweet);
 });
