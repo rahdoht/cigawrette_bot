@@ -78,8 +78,12 @@ export async function renderBot() {
         .then(async (image) => {
           let renderTxt;
           if (tweet.data.referenced_tweets) {
+            console.log("expected reply tweet, trying...")
+            console.log(tweet);
+            console.log(tweet.data.referenced_tweets);
             // Retrieve the parent tweet using the API
             const parentId = tweet.data.referenced_tweets[0].id;
+            console.log(`parentId=${parentId}`);
 
             renderTxt = await new Promise((resolve, reject) => {
               client.tweets.findTweetById(
@@ -87,11 +91,13 @@ export async function renderBot() {
                 {},
                 (err, parentTweet, res) => {
                   if (err) {
+                    console.error(err);
                     reject(err);
                   } else if (parentTweet.data.text) {
                     console.log("Parent tweet: " + parentTweet.data.text);
                     resolve(parentTweet.data.text);
                   } else {
+                    console.error("something unexpected went wrong");
                     reject(new Error("Unable to retrieve parent tweet text"));
                   }
                 }
