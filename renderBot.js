@@ -40,7 +40,7 @@ export async function renderBot() {
           let renderTxt = tweet.data.text.slice(
             "@cigawrettebot render ".length
           );
-          console.log("text to render: ", renderTxt);
+          console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
         })
         .then(async () => {

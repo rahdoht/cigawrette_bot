@@ -1,6 +1,6 @@
-import fs from 'fs'
+import fs from "fs";
 import dotenv from "dotenv";
-import { createCanvas } from 'canvas'
+import { createCanvas } from "canvas";
 
 dotenv.config({ silent: true });
 
@@ -22,45 +22,61 @@ export const oauth = {
 };
 
 export const putLabel = (image, label) => {
-        const IMAGE_WIDTH = 1639;
-        const IMAGE_HEIGHT = 2048;
+  // downsample the original by half
+  const IMAGE_WIDTH = 1728;
+  const IMAGE_HEIGHT = 2160;
 
-        const CANVAS = createCanvas(IMAGE_WIDTH, IMAGE_HEIGHT);
-        const CTX = CANVAS.getContext("2d");
+  const canvas = createCanvas(IMAGE_WIDTH, IMAGE_HEIGHT);
+  const ctx = canvas.getContext("2d");
 
-        const TEXT_X = IMAGE_WIDTH / 2;
-        const TEXT_Y = 1500;
+  const TEXT_X = 915;
+  const TEXT_Y = 1465;
+  // const TEXT_X = 840;
+  // const TEXT_Y = 1540;
+  ctx.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
 
-        /*
-         * draw the image over the whole canvas, starting from
-         * upper origin 0,0, spanning the complete width and
-         * height of the canvas, which is also the preset image height
-         */
-        CTX.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-        //set font
-        //we'll be changing the font size dynamically with #{} later
-        CTX.font = `bold 35px helvetica`;
-        CTX.textAlign = "center";
-        //create the skewing of the text
-        CTX.setTransform(
-          //skewing attributes
-          1.2,
-          -0.2,
-          -0.1,
-          1.5,
-          //placement of origin x,y
-          TEXT_X + 50,
-          TEXT_Y
-        );
-        //right the text with the given attributes
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  var fontSize = 35;
+  ctx.font = `bold ${fontSize}px helvetica`;
 
-        CTX.fillText(
-          label,
-          0,
-          0 //new origin in the middle of the square
-        );
-        //create the image buffer to write to an image file
-        const IMG_BUFFER = CANVAS.toBuffer("image/jpeg");
-        //write buffer to image file
-        fs.writeFileSync("./renderedCig.jpg", IMG_BUFFER);
-}
+  // // helper squares
+  // ctx.save();
+  // ctx.fillStyle = "orange";
+  // ctx.fillRect(TEXT_X, TEXT_Y, 20, 20);
+  // ctx.fillRect(TEXT_X, TEXT_Y + 310, 20, 20);
+  // ctx.restore();
+
+  const maxWidth = 460;
+
+  var words = label.split(/\s+/);
+  var lines = [];
+  var curLine = words[0];
+  for (let i = 1; i < words.length; i++) {
+    var word = words[i];
+    var newWidth = ctx.measureText(curLine + " " + word).width;
+    if (newWidth < maxWidth) {
+      curLine += " " + word;
+    } else {
+      lines.push(curLine);
+      curLine = word;
+    }
+  }
+  lines.push(curLine);
+
+  // center vertically
+  const lineHeight = ctx.measureText(curLine).actualBoundingBoxDescent;
+  const textHeight = lineHeight * lines.length;
+  var deltaY = 120 - textHeight / 2;
+  ctx.setTransform(1.2, -0.215, -0.02, 1.5, TEXT_X, TEXT_Y + deltaY);
+
+  for (let i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    ctx.fillText(line, 0, 0);
+    var height = ctx.measureText(line).actualBoundingBoxDescent;
+    ctx.translate(0, height);
+  }
+
+  const IMG_BUFFER = canvas.toBuffer("image/jpeg");
+  fs.writeFileSync("./renderedCig.jpg", IMG_BUFFER);
+};
