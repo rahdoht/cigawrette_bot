@@ -51,17 +51,6 @@ export async function renderBot() {
     //   }
     // );
     // console.log(tweet2);
-    // var twt = await client.get(
-    //   "statuses/show",
-    //   { id: tweet.data?.referenced_tweets[0].id },
-    //   function (error, parentTweet, response) {
-    //     if (error) reject(error);
-    //     // Use the text from the parent tweet
-    //     console.log("Reply to: " + parentTweet.text);
-    //     resolve(parentTweet.data.text);
-    //   }
-    // );
-    // console.log(twt);
 
     const rules = await client.tweets.getRules();
     console.log(rules);
@@ -78,31 +67,13 @@ export async function renderBot() {
         .then(async (image) => {
           let renderTxt;
           if (tweet.data.referenced_tweets) {
-            console.log("expected reply tweet, trying...")
-            console.log(tweet);
+            // Use the text from the parent tweet
             console.log(tweet.data.referenced_tweets);
-            // Retrieve the parent tweet using the API
             const parentId = tweet.data.referenced_tweets[0].id;
-            console.log(`parentId=${parentId}`);
-
-            renderTxt = await new Promise((resolve, reject) => {
-              client.tweets.findTweetById(
-                parentId,
-                {},
-                (err, parentTweet, res) => {
-                  if (err) {
-                    console.error(err);
-                    reject(err);
-                  } else if (parentTweet.data.text) {
-                    console.log("Parent tweet: " + parentTweet.data.text);
-                    resolve(parentTweet.data.text);
-                  } else {
-                    console.error("something unexpected went wrong");
-                    reject(new Error("Unable to retrieve parent tweet text"));
-                  }
-                }
-              );
-            });
+            parentTweet = await client.tweets.findTweetById(parentId);
+            console.log("parentTweet:");
+            console.log(parentTweet);
+            renderTxt = parentTweet.data?.text;
           } else {
             // Use the text from the current tweet
             console.log("Tweet: " + tweet.data.text);
@@ -112,8 +83,7 @@ export async function renderBot() {
           putLabel(image, renderTxt);
         })
         .then(async () => {
-          //once the file is created, you are able to upload it and use it to make the tweet
-          //do that here:
+          // upload the image and attach it to a tweet
           const photos = [
             {
               path: "./renderedCig.jpg",
