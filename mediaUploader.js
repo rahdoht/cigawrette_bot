@@ -99,10 +99,12 @@ export class TwitterMediaUploader {
     );
   }
 
-  async tweet(status) {
+  async tweet(status, replyId) {
     const url =
       "https://api.twitter.com/1.1/statuses/update.json?status=" +
       fullyEncodeURI(status) +
+      "&in_reply_to_status_id=" +
+      replyId +
       "&media_ids=" +
       this.mediaIds.join(",");
 

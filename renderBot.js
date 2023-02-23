@@ -24,61 +24,35 @@ export async function renderBot() {
     //   }
     // );
 
-    // const tweet = await client.tweets.findTweetById("20");
-    // const tweet = await client.tweets.findTweetById("1628243774160662529", {
-    //   "tweet.fields": [
-    //     "author_id",
-    //     "conversation_id",
-    //     "entities",
-    //     "in_reply_to_user_id",
-    //     "referenced_tweets",
-    //     "context_annotations",
-    //   ],
-    // });
-    // console.log(tweet);
-    // console.log(tweet.data.referenced_tweets);
-    // const tweet2 = await client.tweets.findTweetById(
-    //   tweet.data?.referenced_tweets[0].id,
-    //   {
-    //     "tweet.fields": [
-    //       "author_id",
-    //       "conversation_id",
-    //       "entities",
-    //       "in_reply_to_user_id",
-    //       "referenced_tweets",
-    //       "context_annotations",
-    //     ],
-    //   }
-    // );
-    // console.log(tweet2);
-
     const rules = await client.tweets.getRules();
     console.log(rules);
     const stream = client.tweets.searchStream({
       "tweet.fields": ["author_id", "referenced_tweets"],
     });
 
-    //loop that reads the incoming tweets and makes the content based off of them,
+    // read the stream of incoming tweets that match our rules
     for await (const tweet of stream) {
       let images = fs.readdirSync("./images");
-      let randomCigawrette = Math.floor(Math.random() * images.length);
-      let chosenCig = images[randomCigawrette];
-      loadImage(`images/${chosenCig}`)
+      let randomCig = images[Math.floor(Math.random() * images.length)];
+      loadImage(`images/${randomCig}`)
         .then(async (image) => {
           let renderTxt;
           if (tweet.data.referenced_tweets) {
             // Use the text from the parent tweet
             console.log(tweet.data.referenced_tweets);
             const parentId = tweet.data.referenced_tweets[0].id;
-            parentTweet = await client.tweets.findTweetById(parentId);
+            const parentTweet = await client.tweets.findTweetById(parentId);
             console.log("parentTweet:");
             console.log(parentTweet);
             renderTxt = parentTweet.data?.text;
-          } else {
-            // Use the text from the current tweet
-            console.log("Tweet: " + tweet.data.text);
-            renderTxt = tweet.data.text.slice("@cigawrettebot render ".length);
           }
+          // this somehow catches the @cigawrettebot render and chains a tweet
+          // } else {
+          //   // Use the text from the current tweet
+          //   console.log("tweet:");
+          //   console.log(tweet);
+          //   renderTxt = tweet.data.text.slice("@cigawrettebot render ".length);
+          // }
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
         })
@@ -90,11 +64,12 @@ export async function renderBot() {
               type: "image/jpg",
             },
           ];
+          const user = await client.users.findUserById(tweet.data?.author_id);
           const mediaUploader = new TwitterMediaUploader();
           mediaUploader
             .init(photos)
             .then(mediaUploader.processFile)
-            .then(() => mediaUploader.tweet(""))
+            .then(() => mediaUploader.tweet(`@${user.data?.username}`, tweet.data?.id))
             .catch((e) => console.error("something broke", e));
         });
     }
