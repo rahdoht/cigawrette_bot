@@ -9,23 +9,18 @@ dotenv.config({ silent: true });
 
 export async function renderBot() {
   try {
+    const rule = "@cigawrettebot render";
     const ipfs_url =
       "https://bafybeigvhgkcqqamlukxcmjodalpk2kuy5qzqtx6m4i6pvb7o3ammss3y4.ipfs.dweb.link";
     const blanks = JSON.parse(fs.readFileSync("blanks.json", "utf-8"));
     const client = new Client(process.env.BEARER_TOKEN);
 
-    //the first time you run the bot you will need to add the rules to look for '@cigawrettebot render'
-    // for adding and deleting rules
-    // await client.tweets.addOrDeleteRules(
-    //   {
-    // add: [
-    //    {},
-    // ],
-    //     delete: {
-    //        ids: []
-    //     },
-    //   }
-    // );
+    await client.tweets.addOrDeleteRules({
+      add: [{ value: rule }],
+      // delete: {
+      //   ids: [],
+      // },
+    });
 
     const rules = await client.tweets.getRules();
     console.log(rules);
@@ -48,14 +43,16 @@ export async function renderBot() {
             console.log("parentTweet:");
             console.log(parentTweet);
             renderTxt = parentTweet.data?.text;
+          } else {
+            // Use the text from the current tweet
+            console.log("tweet:");
+            console.log(tweet);
+            renderTxt = tweet.data.text.slice(rule.length);
           }
-          // this somehow catches the @cigawrettebot render and chains a tweet
-          // } else {
-          //   // Use the text from the current tweet
-          //   console.log("tweet:");
-          //   console.log(tweet);
-          //   renderTxt = tweet.data.text.slice("@cigawrettebot render ".length);
-          // }
+          // do not tweet images that just say the rule
+          if (renderTxt === rule) {
+            return;
+          }
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
         })
@@ -72,7 +69,9 @@ export async function renderBot() {
           mediaUploader
             .init(photos)
             .then(mediaUploader.processFile)
-            .then(() => mediaUploader.tweet(`@${user.data?.username}`, tweet.data?.id))
+            .then(() =>
+              mediaUploader.tweet(`@${user.data?.username}`, tweet.data?.id)
+            )
             .catch((e) => console.error("something broke", e));
         });
     }
