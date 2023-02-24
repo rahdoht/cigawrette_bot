@@ -68,10 +68,12 @@ export const putLabel = (image, label) => {
   var deltaY = 120 - textHeight / 2;
   ctx.setTransform(1.2, -0.215, -0.02, 1.5, TEXT_X, TEXT_Y + deltaY);
 
+  let y = 0; // current y-coordinate of the text baseline
   for (let i = 0; i < lines.length; i++) {
     var line = lines[i];
-    ctx.fillText(line, 0, 0);
-    var height = ctx.measureText(line).actualBoundingBoxDescent;
+    var height = ctx.measureText(line).actualBoundingBoxDescent / 1.75;
+    ctx.fillText(line, 0, y);
+    y += height; // increment y by a fraction of the height of the current line
     ctx.translate(0, height);
   }
 
