@@ -23,7 +23,7 @@ export async function renderBot() {
     });
 
     const rules = await client.tweets.getRules();
-    console.log(rules);
+    console.log(`rules= ${JSON.stringify(rules)}`);
     const stream = client.tweets.searchStream({
       "tweet.fields": ["author_id", "referenced_tweets"],
     });
@@ -37,20 +37,18 @@ export async function renderBot() {
           let renderTxt;
           if (tweet.data.referenced_tweets) {
             // Use the text from the parent tweet
-            console.log(tweet.data.referenced_tweets);
             const parentId = tweet.data.referenced_tweets[0].id;
             const parentTweet = await client.tweets.findTweetById(parentId);
-            console.log("parentTweet:");
-            console.log(parentTweet);
+            console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
           } else {
             // Use the text from the current tweet
-            console.log("tweet:");
-            console.log(tweet);
+            console.log(`tweet: ${JSON.stringify(tweet)}`);
             renderTxt = tweet.data.text.slice(rule.length);
           }
           // do not tweet images that include the rule
           if (renderTxt.includes(rule)) {
+            console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
             return;
           }
           console.log("text to render:", renderTxt);

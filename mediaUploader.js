@@ -54,7 +54,7 @@ export class TwitterMediaUploader {
         .then((res) => {
           const mediaId = res.media_id_string;
           this.mediaIds[i] = mediaId;
-          console.log(this.mediaIds[i]);
+          console.log(`mediaId: ${this.mediaIds[i]}`);
           // fs.appendFileSync('/media-ids.txt', mediaId + ' => ' + new Date().toISOString() + '\n');
         })
         .catch((e) =>
