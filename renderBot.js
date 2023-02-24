@@ -73,7 +73,6 @@ export async function renderBot() {
             .catch((e) => console.error("something broke", e));
         });
     }
-    process.exit(0);
   } catch (error) {
     console.error("Error while running the bot: ", error);
   }
