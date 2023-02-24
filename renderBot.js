@@ -35,6 +35,7 @@ export async function renderBot() {
       loadImage(`${ipfs_url}/${randomCig}.jpg`)
         .then(async (image) => {
           let renderTxt;
+          let abort = false;
           if (tweet.data.referenced_tweets) {
             // Use the text from the parent tweet
             const parentId = tweet.data.referenced_tweets[0].id;
@@ -49,13 +50,19 @@ export async function renderBot() {
           // do not tweet images that include the rule
           if (renderTxt.includes(rule)) {
             console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
-            return;
+            abort = true
+            return abort;
           }
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
+          return abort;
         })
-        .then(async () => {
+        .then(async (abort) => {
           // upload the image and attach it to a tweet
+          if (abort) {
+            console.log(`aborting upload: ${abort}`)
+            return;
+          }
           const photos = [
             {
               path: "./renderedCig.jpg",
