@@ -49,8 +49,8 @@ export async function renderBot() {
             console.log(tweet);
             renderTxt = tweet.data.text.slice(rule.length);
           }
-          // do not tweet images that just say the rule
-          if (renderTxt === rule) {
+          // do not tweet images that include the rule
+          if (renderTxt.includes(rule)) {
             return;
           }
           console.log("text to render:", renderTxt);
