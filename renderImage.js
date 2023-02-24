@@ -2,10 +2,6 @@ import fs from "fs";
 import { loadImage } from "canvas";
 import { putLabel } from "./utils.js";
 
-let images = fs.readdirSync("./images");
-let randomCigawette = Math.floor(Math.random() * images.length);
-let chosenCig = images[randomCigawette];
-
 const tweets = [
   // Sarcastic tweets
   "Oh wow, an NFT project based on cigarette packs? Just what the world needs, more glorification of smoking! 🚬👏",
@@ -36,6 +32,13 @@ const tweets = [
 
 let randomTweet = tweets[Math.floor(Math.random() * tweets.length)];
 
-loadImage(`images/${chosenCig}`).then((image) => {
+const blanks = JSON.parse(fs.readFileSync("blanks.json", "utf-8"));
+let randomCig = blanks[Math.floor(Math.random() * blanks.length)];
+console.log(`using cigawrette ${randomCig}`);
+
+const ipfs_url =
+  "https://bafybeigvhgkcqqamlukxcmjodalpk2kuy5qzqtx6m4i6pvb7o3ammss3y4.ipfs.dweb.link";
+
+loadImage(`${ipfs_url}/${randomCig}.jpg`).then((image) => {
   putLabel(image, randomTweet);
 });

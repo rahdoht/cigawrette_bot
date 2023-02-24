@@ -9,6 +9,9 @@ dotenv.config({ silent: true });
 
 export async function renderBot() {
   try {
+    const ipfs_url =
+      "https://bafybeigvhgkcqqamlukxcmjodalpk2kuy5qzqtx6m4i6pvb7o3ammss3y4.ipfs.dweb.link";
+    const blanks = JSON.parse(fs.readFileSync("blanks.json", "utf-8"));
     const client = new Client(process.env.BEARER_TOKEN);
 
     //the first time you run the bot you will need to add the rules to look for '@cigawrettebot render'
@@ -32,9 +35,9 @@ export async function renderBot() {
 
     // read the stream of incoming tweets that match our rules
     for await (const tweet of stream) {
-      let images = fs.readdirSync("./images");
-      let randomCig = images[Math.floor(Math.random() * images.length)];
-      loadImage(`images/${randomCig}`)
+      let randomCig = blanks[Math.floor(Math.random() * blanks.length)];
+      console.log(`using cigawrette ${randomCig}`);
+      loadImage(`${ipfs_url}/${randomCig}.jpg`)
         .then(async (image) => {
           let renderTxt;
           if (tweet.data.referenced_tweets) {
