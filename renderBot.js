@@ -25,7 +25,7 @@ export async function renderBot() {
     const rules = await client.tweets.getRules();
     console.log(`rules= ${JSON.stringify(rules)}`);
     const stream = client.tweets.searchStream({
-      "tweet.fields": ["author_id", "referenced_tweets"],
+      "tweet.fields": ["author_id", "referenced_tweets", "entities"],
     });
 
     // read the stream of incoming tweets that match our rules
@@ -42,6 +42,10 @@ export async function renderBot() {
             const parentTweet = await client.tweets.findTweetById(parentId);
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
+            // strip reply mentions from the beginning of the text
+            tweet.data.entities.mentions.forEach((mention) => {
+              renderTxt = renderTxt.replace(`@${mention.username} `, "");
+            });
           } else {
             // Use the text from the current tweet
             console.log(`tweet: ${JSON.stringify(tweet)}`);
@@ -50,7 +54,7 @@ export async function renderBot() {
           // do not tweet images that include the rule
           if (renderTxt.includes(rule)) {
             console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
-            abort = true
+            abort = true;
             return abort;
           }
           console.log("text to render:", renderTxt);
@@ -60,7 +64,7 @@ export async function renderBot() {
         .then(async (abort) => {
           // upload the image and attach it to a tweet
           if (abort) {
-            console.log(`aborting upload: ${abort}`)
+            console.log(`aborting upload: ${abort}`);
             return;
           }
           const photos = [
