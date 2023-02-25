@@ -25,7 +25,12 @@ export async function renderBot() {
     const rules = await client.tweets.getRules();
     console.log(`rules= ${JSON.stringify(rules)}`);
     const stream = client.tweets.searchStream({
-      "tweet.fields": ["author_id", "referenced_tweets", "entities"],
+      "tweet.fields": [
+        "author_id",
+        "referenced_tweets",
+        "entities",
+        "attachments",
+      ],
     });
 
     // read the stream of incoming tweets that match our rules
@@ -45,6 +50,14 @@ export async function renderBot() {
             // strip reply mentions from the beginning of the text
             tweet.data.entities.mentions.forEach((mention) => {
               renderTxt = renderTxt.replace(`@${mention.username} `, "");
+            });
+            // strip urls that are equivent to the attached media
+            tweet.data.entities.urls.forEach((url) => {
+              tweet.data.attachments.media_keys.forEach((mediaKey) => {
+                if (mediaKey === url.media_key) {
+                  renderTxt = renderTxt.replace(`@${url.url}`, "");
+                }
+              });
             });
           } else {
             // Use the text from the current tweet
