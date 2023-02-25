@@ -48,12 +48,12 @@ export async function renderBot() {
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
             // strip reply mentions from the beginning of the text
-            tweet.data.entities.mentions.forEach((mention) => {
+            tweet.data.entities.mentions?.forEach((mention) => {
               renderTxt = renderTxt.replace(`@${mention.username} `, "");
             });
             // strip urls that are equivent to the attached media
-            tweet.data.entities.urls.forEach((url) => {
-              tweet.data.attachments.media_keys.forEach((mediaKey) => {
+            tweet.data.entities.urls?.forEach((url) => {
+              tweet.data.attachments.media_keys?.forEach((mediaKey) => {
                 if (mediaKey === url.media_key) {
                   renderTxt = renderTxt.replace(`@${url.url}`, "");
                 }
