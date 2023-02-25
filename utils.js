@@ -25,57 +25,67 @@ export const putLabel = (image, label) => {
   // downsample the original by half
   const IMAGE_WIDTH = 1728;
   const IMAGE_HEIGHT = 2160;
+  // picked from testing
+  const TEXT_X = 920;
+  const TEXT_Y = 1500;
+  const labelWidth = 480;
+  const labelHeight = 225;
 
   const canvas = createCanvas(IMAGE_WIDTH, IMAGE_HEIGHT);
   const ctx = canvas.getContext("2d");
 
-  const TEXT_X = 915;
-  const TEXT_Y = 1465;
   ctx.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  var fontSize = 28;
-  ctx.font = `bold ${fontSize}px helvetica`;
 
-  // // helper squares
-  // ctx.save();
-  // ctx.fillStyle = "orange";
-  // ctx.fillRect(TEXT_X, TEXT_Y, 20, 20);
-  // ctx.fillRect(TEXT_X, TEXT_Y + 310, 20, 20);
-  // ctx.restore();
+  const formatText = (label, fontSize) => {
+    ctx.font = `bold ${fontSize}px helvetica`;
+    let lines = [];
+    let words = label.split(/\s+/);
+    let curLine = words[0];
+    words.forEach((word) => {
+      let newWidth = ctx.measureText(curLine + " " + word).width;
+      if (newWidth < labelWidth) {
+        curLine += " " + word;
+      } else {
+        lines.push(curLine);
+        curLine = word;
+      }
+    });
+    lines.push(curLine);
+    return lines;
+  };
 
-  const maxWidth = 460;
-
-  var words = label.split(/\s+/);
-  var lines = [];
-  var curLine = words[0];
-  for (let i = 1; i < words.length; i++) {
-    var word = words[i];
-    var newWidth = ctx.measureText(curLine + " " + word).width;
-    if (newWidth < maxWidth) {
-      curLine += " " + word;
-    } else {
-      lines.push(curLine);
-      curLine = word;
-    }
+  let lines;
+  let textHeight = labelHeight + 1;
+  let textWidth = 0;
+  let fontSize = 43;
+  while (textHeight > labelHeight) {
+    fontSize -= 1;
+    // break up lines according to fontSize
+    lines = formatText(label, fontSize);
+    // calculate textHeight for this fontSize
+    textHeight = 0;
+    lines.forEach((line) => {
+      let textMeasure = ctx.measureText(line);
+      textHeight += textMeasure.emHeightDescent;
+      textWidth = Math.max(textWidth, textMeasure.width);
+    });
+    // set transformation with a deltaY fudge factor from testing
+    let deltaY = 95 - textHeight / 2;
+    ctx.setTransform(1.2, -0.215, -0.02, 1.5, TEXT_X, TEXT_Y + deltaY);
   }
-  lines.push(curLine);
-
-  // center vertically
-  const lineHeight = ctx.measureText(curLine).actualBoundingBoxDescent;
-  const textHeight = lineHeight * lines.length;
-  var deltaY = 120 - textHeight / 2;
-  ctx.setTransform(1.2, -0.215, -0.02, 1.5, TEXT_X, TEXT_Y + deltaY);
+  console.log(
+    `fontSize=${fontSize} textWidth=${textWidth} textHeight=${textHeight}`
+  );
 
   let y = 0; // current y-coordinate of the text baseline
-  for (let i = 0; i < lines.length; i++) {
-    var line = lines[i];
-    var height = ctx.measureText(line).actualBoundingBoxDescent / 1.75;
+  lines.forEach((line) => {
+    let height = ctx.measureText(line).emHeightDescent / 2.2;
     ctx.fillText(line, 0, y);
     y += height; // increment y by a fraction of the height of the current line
     ctx.translate(0, height);
-  }
+  });
 
   const IMG_BUFFER = canvas.toBuffer("image/jpeg");
   fs.writeFileSync("./renderedCig.jpg", IMG_BUFFER);
