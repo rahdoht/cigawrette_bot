@@ -43,15 +43,16 @@ export const putLabel = (image, label) => {
     let lines = [];
     let words = label.split(/\s+/);
     let curLine = words[0];
-    words.forEach((word) => {
-      let newWidth = ctx.measureText(curLine + " " + word).width;
-      if (newWidth < labelWidth) {
+    for (let i = 1; i < words.length; i++) {
+      var word = words[i];
+      var newWidth = ctx.measureText(curLine + " " + word).width;
+      if (newWidth < maxWidth) {
         curLine += " " + word;
       } else {
         lines.push(curLine);
         curLine = word;
       }
-    });
+    }
     lines.push(curLine);
     return lines;
   };
