@@ -15,12 +15,13 @@ export async function renderBot() {
     const blanks = JSON.parse(fs.readFileSync("blanks.json", "utf-8"));
     const client = new Client(process.env.BEARER_TOKEN);
 
-    await client.tweets.addOrDeleteRules({
-      add: [{ value: rule }],
-      // delete: {
-      //   ids: [],
-      // },
-    });
+    // // adding/deleting rules eats up the rate limit
+    // await client.tweets.addOrDeleteRules({
+    //   add: [{ value: rule }],
+    //   // delete: {
+    //   //   ids: [],
+    //   // },
+    // });
 
     const rules = await client.tweets.getRules();
     console.log(`rules= ${JSON.stringify(rules)}`);
