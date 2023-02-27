@@ -74,6 +74,7 @@ export async function renderBot() {
             console.log(`tweet: ${JSON.stringify(tweet)}`);
             renderTxt = tweet.data.text.slice(rule.length + 1);
           }
+          renderTxt = renderTxt.replace(/&amp;/gi, "&");
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
           return abort;
