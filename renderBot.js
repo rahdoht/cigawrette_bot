@@ -41,34 +41,38 @@ export async function renderBot() {
         .then(async (image) => {
           let renderTxt;
           let abort = false;
+          // Use text from parent tweet
           if (tweet.data.referenced_tweets) {
-            // Use the text from the parent tweet
             const parentId = tweet.data.referenced_tweets[0].id;
             const parentTweet = await client.tweets.findTweetById(parentId);
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
             // strip reply mentions from the beginning of the text
             tweet.data.entities.mentions?.forEach((mention) => {
+              console.log(`stripping ${mention.username}`)
               renderTxt = renderTxt.replace(`@${mention.username} `, "");
             });
             // strip urls that are equivent to the attached media
             tweet.data.entities.urls?.forEach((url) => {
               tweet.data.attachments.media_keys?.forEach((mediaKey) => {
                 if (mediaKey === url.media_key) {
+                  console.log(`stripping ${url.url}`);
                   renderTxt = renderTxt.replace(`@${url.url}`, "");
+                } else {
+                  console.log(`not stripping ${url.url} bc ${mediaKey} != ${url.media_key}`);
                 }
               });
             });
+            // catch second tweet that and abort
+            if (renderTxt.includes(rule)) {
+              console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
+              abort = true;
+              return abort;
+            }
+          // Use the text from the current tweet
           } else {
-            // Use the text from the current tweet
             console.log(`tweet: ${JSON.stringify(tweet)}`);
-            renderTxt = tweet.data.text.slice(rule.length);
-          }
-          // do not tweet images that include the rule
-          if (renderTxt.includes(rule)) {
-            console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
-            abort = true;
-            return abort;
+            renderTxt = tweet.data.text.slice(rule.length + 1);
           }
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
