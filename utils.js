@@ -40,21 +40,22 @@ export const putLabel = (image, label) => {
 
   const formatText = (label, fontSize) => {
     ctx.font = `bold ${fontSize}px helvetica`;
-    let lines = [];
+    let allLines = [];
     let words = label.split(/\s+/);
     let curLine = words[0];
-    for (let i = 1; i < words.length; i++) {
-      var word = words[i];
-      var newWidth = ctx.measureText(curLine + " " + word).width;
-      if (newWidth < maxWidth) {
-        curLine += " " + word;
-      } else {
-        lines.push(curLine);
-        curLine = word;
+    words.forEach((word, index) => {
+      if (index > 0) {
+        let newWidth = ctx.measureText(curLine + " " + word).width;
+        if (newWidth < labelWidth) {
+          curLine += " " + word;
+        } else {
+          allLines.push(curLine);
+          curLine = word;
+        }
       }
-    }
-    lines.push(curLine);
-    return lines;
+    });
+    allLines.push(curLine);
+    return allLines;
   };
 
   let lines;
