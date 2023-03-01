@@ -42,11 +42,13 @@ export async function renderBot() {
         .then(async (image) => {
           const requester = await client.users.findUserById(tweet.data?.author_id);
           let replyTweet = `@${requester.data?.username}`;
+          let replyId = tweet.data?.id;
           let renderTxt;
           let abort = false;
           // Use text from parent tweet
           if (tweet.data.referenced_tweets) {
             const parentId = tweet.data.referenced_tweets[0].id;
+            replyId = parentId;
             const parentTweet = await client.tweets.findTweetById(parentId, { "tweet.fields": ["author_id"] });
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
@@ -70,7 +72,7 @@ export async function renderBot() {
             if (renderTxt.includes(rule)) {
               console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
               abort = true;
-              return [abort, replyTweet];
+              return [abort, replyTweet, replyId];
             }
             // reply to op, but tag requester
             const op = await client.users.findUserById(parentTweet.data?.author_id);
@@ -82,10 +84,10 @@ export async function renderBot() {
           renderTxt = renderTxt.replace(/&amp;/gi, "&");
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
-          return [abort, replyTweet];
+          return [abort, replyTweet, replyId];
         })
         .then(async (data) => {
-          let [abort, replyTweet] = data;
+          let [abort, replyTweet, replyId] = data;
           // upload the image and attach it to a tweet
           if (abort) {
             console.log(`aborting upload: ${abort}`);
@@ -102,7 +104,7 @@ export async function renderBot() {
             .init(photos)
             .then(mediaUploader.processFile)
             .then(() =>
-              mediaUploader.tweet(replyTweet, tweet.data?.id)
+              mediaUploader.tweet(replyTweet, replyId)
             )
             .catch((e) => console.error("mediaUploader broke", e));
         }).catch((e) => console.error("loadImage chain broke", e));
