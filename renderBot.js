@@ -47,7 +47,7 @@ export async function renderBot() {
           // Use text from parent tweet
           if (tweet.data.referenced_tweets) {
             const parentId = tweet.data.referenced_tweets[0].id;
-            const parentTweet = await client.tweets.findTweetById(parentId);
+            const parentTweet = await client.tweets.findTweetById(parentId, { "tweet.fields": ["author_id"] });
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
             // strip reply mentions from the beginning of the text
