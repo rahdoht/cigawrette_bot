@@ -41,7 +41,8 @@ export async function renderBot() {
       loadImage(`${ipfs_url}/${randomCig}.jpg`)
         .then(async (image) => {
           const requester = await client.users.findUserById(tweet.data?.author_id);
-          let replyTweet = `@${requester.data?.username}`;
+          // let replyTweet = `@${requester.data?.username}`;
+          let replyTweet = "";
           let replyId = tweet.data?.id;
           let renderTxt;
           let abort = false;
@@ -75,8 +76,8 @@ export async function renderBot() {
               return [abort, replyTweet, replyId];
             }
             // reply to op, but tag requester
-            const op = await client.users.findUserById(parentTweet.data?.author_id);
-            replyTweet = `@${op.data?.username} smoke @${requester.data?.username} while you got em`
+            // const op = await client.users.findUserById(parentTweet.data?.author_id);
+            // replyTweet = `@${op.data?.username} smoke @${requester.data?.username} while you got em`
           } else { // Use the text from the current tweet
             console.log(`tweet: ${JSON.stringify(tweet)}`);
             renderTxt = tweet.data.text.slice(rule.length + 1);
