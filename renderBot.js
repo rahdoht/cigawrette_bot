@@ -40,6 +40,8 @@ export async function renderBot() {
       console.log(`using cigawrette ${randomCig}`);
       loadImage(`${ipfs_url}/${randomCig}.jpg`)
         .then(async (image) => {
+          const requester = await client.users.findUserById(tweet.data?.author_id);
+          let replyTweet = `@${requester.data?.username}`;
           let renderTxt;
           let abort = false;
           // Use text from parent tweet
@@ -68,19 +70,22 @@ export async function renderBot() {
             if (renderTxt.includes(rule)) {
               console.log(`skipping tweet bc rule: ${JSON.stringify(renderTxt)}`);
               abort = true;
-              return abort;
+              return [abort, replyTweet];
             }
-          // Use the text from the current tweet
-          } else {
+            // reply to op, but tag requester
+            const op = await client.users.findUserById(parentTweet.data?.author_id);
+            replyTweet = `@${op.data?.username} @${requester.data?.username}`
+          } else { // Use the text from the current tweet
             console.log(`tweet: ${JSON.stringify(tweet)}`);
             renderTxt = tweet.data.text.slice(rule.length + 1);
           }
           renderTxt = renderTxt.replace(/&amp;/gi, "&");
           console.log("text to render:", renderTxt);
           putLabel(image, renderTxt);
-          return abort;
+          return [abort, replyTweet];
         })
-        .then(async (abort) => {
+        .then(async (data) => {
+          let [abort, replyTweet] = data;
           // upload the image and attach it to a tweet
           if (abort) {
             console.log(`aborting upload: ${abort}`);
@@ -92,16 +97,15 @@ export async function renderBot() {
               type: "image/jpg",
             },
           ];
-          const user = await client.users.findUserById(tweet.data?.author_id);
           const mediaUploader = new TwitterMediaUploader();
           mediaUploader
             .init(photos)
             .then(mediaUploader.processFile)
             .then(() =>
-              mediaUploader.tweet(`@${user.data?.username}`, tweet.data?.id)
+              mediaUploader.tweet(replyTweet, tweet.data?.id)
             )
-            .catch((e) => console.error("something broke", e));
-        });
+            .catch((e) => console.error("mediaUploader broke", e));
+        }).catch((e) => console.error("loadImage chain broke", e));
     }
   } catch (error) {
     console.error("Error while running the bot: ", error);
