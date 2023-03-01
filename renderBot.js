@@ -74,7 +74,7 @@ export async function renderBot() {
             }
             // reply to op, but tag requester
             const op = await client.users.findUserById(parentTweet.data?.author_id);
-            replyTweet = `@${op.data?.username} @${requester.data?.username}`
+            replyTweet = `@${op.data?.username} smoke @${requester.data?.username} while you got em`
           } else { // Use the text from the current tweet
             console.log(`tweet: ${JSON.stringify(tweet)}`);
             renderTxt = tweet.data.text.slice(rule.length + 1);
