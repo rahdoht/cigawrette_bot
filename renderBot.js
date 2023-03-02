@@ -47,8 +47,8 @@ export async function renderBot() {
           let renderTxt;
           let abort = false;
           // Use text from parent tweet
-          if (tweet.data.in_reply_to_user_id) {
-            replyId = tweet.data.in_reply_to_user_id;
+          if (tweet.data.referenced_tweets) {
+            replyId = tweet.data.referenced_tweets[0].id;
             const parentTweet = await client.tweets.findTweetById(replyId, { "tweet.fields": ["author_id"] });
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
