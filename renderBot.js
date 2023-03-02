@@ -31,6 +31,7 @@ export async function renderBot() {
         "referenced_tweets",
         "entities",
         "attachments",
+        "in_reply_to_user_id",
       ],
     });
 
@@ -41,16 +42,14 @@ export async function renderBot() {
       loadImage(`${ipfs_url}/${randomCig}.jpg`)
         .then(async (image) => {
           const requester = await client.users.findUserById(tweet.data?.author_id);
-          // let replyTweet = `@${requester.data?.username}`;
-          let replyTweet = "";
+          let replyTweet = `Thank you for smoking @cigawrettepacks @${requester.data?.username}`;
           let replyId = tweet.data?.id;
           let renderTxt;
           let abort = false;
           // Use text from parent tweet
-          if (tweet.data.referenced_tweets) {
-            const parentId = tweet.data.referenced_tweets[0].id;
-            replyId = parentId;
-            const parentTweet = await client.tweets.findTweetById(parentId, { "tweet.fields": ["author_id"] });
+          if (tweet.data.in_reply_to_user_id) {
+            replyId = tweet.data.in_reply_to_user_id;
+            const parentTweet = await client.tweets.findTweetById(replyId, { "tweet.fields": ["author_id"] });
             console.log(`parentTweet: ${JSON.stringify(parentTweet)}`);
             renderTxt = parentTweet.data?.text;
             // strip reply mentions from the beginning of the text
@@ -76,8 +75,8 @@ export async function renderBot() {
               return [abort, replyTweet, replyId];
             }
             // reply to op, but tag requester
-            // const op = await client.users.findUserById(parentTweet.data?.author_id);
-            // replyTweet = `@${op.data?.username} smoke @${requester.data?.username} while you got em`
+            const op = await client.users.findUserById(parentTweet.data?.author_id);
+            replyTweet = `@${op.data?.username} Thank you for smoking @cigawrettepacks @${requester.data?.username}`;
           } else { // Use the text from the current tweet
             console.log(`tweet: ${JSON.stringify(tweet)}`);
             renderTxt = tweet.data.text.slice(rule.length + 1);
